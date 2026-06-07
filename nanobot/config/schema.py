@@ -33,13 +33,14 @@ class ChannelsConfig(BaseModel):
 
     whatsapp: WhatsAppConfig = Field(default_factory=WhatsAppConfig)
     telegram: TelegramConfig = Field(default_factory=TelegramConfig)
+    feishu: FeishuSecretaryConfig = Field(default_factory=FeishuSecretaryConfig)
 
 
 class AgentDefaults(BaseModel):
     """Default agent configuration."""
 
     workspace: str = "~/.nanobot/workspace"
-    model: str = "anthropic/claude-opus-4-5"
+    model: str = "deepseek/deepseek-reasoner"
     max_tokens: int = 8192
     temperature: float = 0.7
     max_tool_iterations: int = 20

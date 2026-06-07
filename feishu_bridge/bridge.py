@@ -217,6 +217,7 @@ class ChatListener:
                 past_cursor = True
                 continue
             if past_cursor and conver_time(message["create_time"]) > self.start_time:
+                logger.info(f"New message from feishu chat_id={self.chat_id}: {message}")
                 new_messages.append(message)
 
         if not past_cursor:
@@ -248,15 +249,14 @@ class AllChatListener:
 
     def __init__(
         self,
-        msg_list_listener: MsgListListener,
         workspace: Path,
         message_bus: MessageBus,
         poll_interval: float = 15.0,
         max_concurrent_chat_polls: int = 8,
         chat_poll_timeout: float = 10.0,
     ) -> None:
-        self.msg_list_listener = msg_list_listener
         self.workspace = workspace
+        self.msg_list_listener = MsgListListener(workspace)
         self.message_bus = message_bus
         self.poll_interval = poll_interval
         self.max_concurrent_chat_polls = max(1, max_concurrent_chat_polls)
