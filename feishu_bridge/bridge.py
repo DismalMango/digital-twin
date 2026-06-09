@@ -1,5 +1,6 @@
 import asyncio
 import json
+import subprocess
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -117,9 +118,15 @@ class ChatListener:
     """Poll new messages for one chat."""
 
     def __init__(
-        self, chat_id: str, workspace: Path, message_bus: MessageBus, start_time: datetime
+        self,
+        chat_id: str,
+        user_id: str,
+        workspace: Path,
+        message_bus: MessageBus,
+        start_time: datetime,
     ):
         self.chat_id = chat_id
+        self.user_id = user_id
         self.workspace = workspace
         self.message_bus = message_bus
         self.start_time = start_time
@@ -216,6 +223,8 @@ class ChatListener:
             if message["message_id"] == self._latest_message_id:
                 past_cursor = True
                 continue
+            if message["sender"]["id"] == self.user_id:
+                continue
             if past_cursor and conver_time(message["create_time"]) > self.start_time:
                 logger.info(f"New message from feishu chat_id={self.chat_id}: {message}")
                 new_messages.append(message)
@@ -265,6 +274,14 @@ class AllChatListener:
         self.start_time = datetime.now()
         self._chat_listeners: dict[str, ChatListener] = {}
         self._chat_poll_semaphore = asyncio.Semaphore(self.max_concurrent_chat_polls)
+        self.user_id = (
+            subprocess.run(
+                ["lark-cli", "contact", "+get-user", "--as", "user", "--jq", ".data.user.open_id"],
+                capture_output=True,
+            )
+            .stdout.decode("utf-8")
+            .strip()
+        )
 
     @staticmethod
     def _extract_chat_id(chat: dict[str, Any]) -> str | None:
@@ -285,6 +302,7 @@ class AllChatListener:
 
             listener = ChatListener(
                 chat_id=chat_id,
+                user_id=self.user_id,
                 workspace=self.workspace,
                 message_bus=self.message_bus,
                 start_time=self.start_time,
