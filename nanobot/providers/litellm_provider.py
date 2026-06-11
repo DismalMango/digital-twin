@@ -21,7 +21,7 @@ class LiteLLMProvider(LLMProvider):
         self,
         api_key: str | None = None,
         api_base: str | None = None,
-        default_model: str = "deepseek/deepseek-reasoner",
+        default_model: str = "deepseek/deepseek-v4-pro",
     ):
         super().__init__(api_key, api_base)
         self.default_model = default_model

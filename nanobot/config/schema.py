@@ -40,7 +40,7 @@ class AgentDefaults(BaseModel):
     """Default agent configuration."""
 
     workspace: str = "~/.nanobot/workspace"
-    model: str = "deepseek/deepseek-reasoner"
+    model: str = "deepseek/deepseek-v4-pro"
     max_tokens: int = 8192
     temperature: float = 0.7
     max_tool_iterations: int = 20
