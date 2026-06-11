@@ -3,6 +3,8 @@
 from pathlib import Path
 from typing import Any
 
+from loguru import logger
+
 from nanobot.agent.memory import MemoryStore
 from nanobot.agent.skills import SkillsLoader
 
@@ -74,12 +76,14 @@ Skills with available="false" need dependencies installed first - you can try in
         now = datetime.now().strftime("%Y-%m-%d %H:%M (%A)")
         workspace_path = str(self.workspace.expanduser().resolve())
 
-        return f"""# nanobot 🐈
+        return f"""# Digital Secretary
 
-You are nanobot, a helpful AI assistant. You have access to tools that allow you to:
-- Read, write, and edit files
-- Execute shell commands
-- Search the web and fetch web pages
+You are Digital Secretary, a helpful AI assistant acting on behalf of the user.
+
+You will receive messages from people other than the user. Your task is to understand each incoming message and respond appropriately as the user’s delegated assistant.
+
+You have access to tools that allow you to:
+- Read files
 - Send messages to users on chat channels
 
 ## Current Time
@@ -88,12 +92,27 @@ You are nanobot, a helpful AI assistant. You have access to tools that allow you
 ## Workspace
 Your workspace is at: {workspace_path}
 - Memory files: {workspace_path}/memory/MEMORY.md
-- Daily notes: {workspace_path}/memory/YYYY-MM-DD.md
+- Daily notes: {workspace_path}/diary/YYYY-MM-DD.md
 - Custom skills: {workspace_path}/skills/{{skill-name}}/SKILL.md
 
 IMPORTANT: When responding to direct questions or conversations, reply directly with your text response.
 Only use the 'message' tool when you need to send a message to a specific chat channel (like WhatsApp).
 For normal conversation, just respond with text - do not call the message tool.
+
+Your response must be plain text only. Markdown is forbidden.
+
+Never output:
+# headings
+- bullet points
+1. numbered lists
+``` code blocks
+**bold text**
+`inline code`
+| tables |
+
+Use only normal sentences and paragraphs.
+
+YOU MUST KEEP ANSWER CLEAN AND SHORT.
 
 Always be helpful, accurate, and concise. When using tools, explain what you're doing.
 When remembering something, write to {workspace_path}/memory/MEMORY.md"""
@@ -115,6 +134,7 @@ When remembering something, write to {workspace_path}/memory/MEMORY.md"""
         history: list[dict[str, Any]],
         current_message: str,
         skill_names: list[str] | None = None,
+        rag_docs: str | None = None,
     ) -> list[dict[str, Any]]:
         """
         Build the complete message list for an LLM call.
@@ -135,9 +155,13 @@ When remembering something, write to {workspace_path}/memory/MEMORY.md"""
 
         # History
         messages.extend(history)
+        logger.info(f"RAG Documents: {rag_docs}")
+        cur_msg_with_rag = (
+            f"# RAG Documents\n\n{rag_docs}\n\n---\n\n# Current User Message\n\n{current_message}"
+        )
 
         # Current message
-        messages.append({"role": "user", "content": current_message})
+        messages.append({"role": "user", "content": cur_msg_with_rag})
 
         return messages
 

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from agentic_search.rag_graph import rag_graph
 from nanobot.agent.context import ContextBuilder
 from nanobot.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTool, WriteFileTool
 from nanobot.agent.tools.message import MessageTool
@@ -105,6 +106,12 @@ class AgentLoop:
         self._running = False
         logger.info("Agent loop stopping")
 
+    def _get_rag_docs(self, user_query: str):
+        """Get the RAG documents."""
+        result = rag_graph.invoke({"user_query": user_query, "retrieved_documents": []})
+        docs = result.get("retrieved_documents", [])
+        return "\n\n---\n\n".join(docs)
+
     async def _process_message(self, msg: InboundMessage) -> OutboundMessage | None:
         """
         Process a single inbound message.
@@ -127,7 +134,9 @@ class AgentLoop:
 
         # Build initial messages (use get_history for LLM-formatted messages)
         messages = self.context.build_messages(
-            history=session.get_history(), current_message=msg.content
+            history=session.get_history(),
+            current_message=msg.content,
+            rag_docs=self._get_rag_docs(msg.content),
         )
 
         # Agent loop
