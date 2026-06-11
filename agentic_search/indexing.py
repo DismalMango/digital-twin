@@ -11,7 +11,7 @@ from langchain_text_splitters import MarkdownTextSplitter
 from openai import OpenAI
 from rank_bm25 import BM25Okapi
 
-from constants import WORKSPACE_PATH
+from agentic_search.constants import WORKSPACE_PATH
 
 
 class Chunker:

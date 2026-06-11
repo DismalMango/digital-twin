@@ -2,8 +2,8 @@ from pathlib import Path
 from threading import Lock
 from typing import TYPE_CHECKING
 
+from agentic_search.constants import WORKSPACE_PATH
 from agentic_search.rag_state import GraphState
-from constants import WORKSPACE_PATH
 
 if TYPE_CHECKING:
     from agentic_search.diary import DiaryStore

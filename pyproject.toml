@@ -1,13 +1,13 @@
 [project]
-name = "nanobot-ai"
-version = "0.1.3.post1"
-description = "A lightweight personal AI assistant framework"
+name = "digital-secretary"
+version = "0.1.0"
+description = "A personal digital secretary powered by AI agents"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "nanobot contributors"}
+    {name = "digital-secretary contributors"}
 ]
-keywords = ["ai", "agent", "chatbot"]
+keywords = ["ai", "agent", "digital-secretary", "personal-assistant"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -49,17 +49,18 @@ dev = [
 ]
 
 [project.scripts]
-nanobot = "nanobot.cli.commands:app"
+digital-secretary = "nanobot.cli.commands:app"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["nanobot"]
-
-[tool.hatch.build.targets.wheel.sources]
-"nanobot" = "nanobot"
+packages = [
+    "nanobot",
+    "agentic_search",
+    "feishu_bridge",
+]
 
 # Include non-Python files in skills
 [tool.hatch.build]
@@ -67,13 +68,18 @@ include = [
     "nanobot/**/*.py",
     "nanobot/skills/**/*.md",
     "nanobot/skills/**/*.sh",
+    "agentic_search/**/*.py",
+    "feishu_bridge/**/*.py",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
     "nanobot/",
+    "agentic_search/",
+    "feishu_bridge/",
     "README.md",
     "LICENSE",
+    "pyproject.toml",
 ]
 
 [tool.ruff]
@@ -87,3 +93,9 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "build>=1.5.0",
+    "twine>=6.2.0",
+]
