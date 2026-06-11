@@ -11,6 +11,8 @@ from langchain_text_splitters import MarkdownTextSplitter
 from openai import OpenAI
 from rank_bm25 import BM25Okapi
 
+from constants import WORKSPACE_PATH
+
 
 class Chunker:
     def __init__(self, chunk_size=100, chunk_overlap=10) -> None:
@@ -84,11 +86,11 @@ class Vectorizer:
 class ChromaDB:
     def __init__(
         self,
-        path: str = "./chroma_db",
+        path: str | None = None,
         collection_name: str = "my_notes",
         vectorizer: Vectorizer | None = None,
     ) -> None:
-        self.client = chromadb.PersistentClient(path=path)
+        self.client = chromadb.PersistentClient(path=path or str(WORKSPACE_PATH / "chroma_db"))
         self.collection = self.client.get_or_create_collection(name=collection_name)
         self.vectorizer = vectorizer or Vectorizer(corpus=[])
 
