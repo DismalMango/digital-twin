@@ -1,6 +1,7 @@
 """CLI commands for nanobot."""
 
 import asyncio
+import os
 from pathlib import Path
 
 import typer
@@ -178,12 +179,15 @@ def gateway(
     bus = MessageBus()
 
     # Create provider (supports OpenRouter, Anthropic, OpenAI)
-    api_key = config.get_api_key()
+    api_key = config.get_api_key() or os.environ.get("OPENAI_API_KEY")
     api_base = config.get_api_base()
 
     if not api_key:
         console.print("[red]Error: No API key configured.[/red]")
-        console.print("Set one in ~/.nanobot/config.json under providers.openrouter.apiKey")
+        console.print(
+            "Set one in ~/.nanobot/config.json under providers.openai.apiKey "
+            "or export OPENAI_API_KEY."
+        )
         raise typer.Exit(1)
 
     provider = LiteLLMProvider(
