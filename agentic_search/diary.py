@@ -38,7 +38,7 @@ class DiaryStore:
             raise ValueError("No scores returned from model")
 
     def _get_all_markdown_texts(self) -> list[str]:
-        return [doc.read_text(encoding="utf-8") for doc in self.diary_dir.glob("*.md")]
+        return [doc.read_text(encoding="utf-8") for doc in self.diary_dir.rglob("*.md")]
 
     def _convert_docs_to_corpus(self) -> None:
         self.corpus = self.chunker.chunk_markdown_texts(self.all_markdown_texts)
