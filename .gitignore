@@ -5,3 +5,4 @@ diary/
 __pycache__/
 docs/
 chroma_db/
+dist/
